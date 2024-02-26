@@ -1,0 +1,33 @@
+import java.io.*;
+/**
+ *
+ * @author celia
+ */
+public class Comptador {
+    public static int getTerminalColumns() {
+        int columns = 0;
+        try {
+            // Ejecutar el comando 'tput cols' en el terminal
+            ProcessBuilder pb = new ProcessBuilder("bash", "-c", "tput cols");
+            Process proceso = pb.start();
+            
+            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+            String line = reader.readLine();
+            if (line != null) {
+                //convertimos la salida del comando tput cols, que es una cadena de texto representando un número, en un valor entero
+                //line.trim(): Esto elimina cualquier espacio en blanco al principio o al final de la cadena line.
+                columns = Integer.parseInt(line.trim());
+            }
+            // Esperar a que el proceso termine
+            proceso.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return columns;
+    }
+
+    public static void main(String[] args) {
+        int columns = getTerminalColumns();
+        System.out.println("Número de columnas en el terminal: " + columns);
+    }
+}
