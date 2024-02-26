@@ -1,7 +1,7 @@
 import java.io.*;
 /**
  *
- * @author celia
+ * @author celia i sara
  */
 public class Comptador {
     public static int getTerminalColumns() {
