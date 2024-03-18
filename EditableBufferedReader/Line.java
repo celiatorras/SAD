@@ -1,8 +1,9 @@
+package EditableBufferedReader;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package EditableBufferedReader;
 
 /**
  *
@@ -33,7 +34,8 @@ public class Line {
     
     public void suprChar() {
         if (cursorPosition < text.length()) {
-            text.deleteCharAt(cursorPosition + 1);
+            text.deleteCharAt(cursorPosition);
+            moveCursorRight();
         }
     }
     
@@ -81,5 +83,4 @@ public class Line {
         return text.length();
     }
 }
-
 
