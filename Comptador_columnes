@@ -1,33 +1,93 @@
-import java.io.*;
-/**
- *
- * @author celia i sara
- */
-public class Comptador {
-    public static int getTerminalColumns() {
-        int columns = 0;
-        try {
-            // Ejecutar el comando 'tput cols' en el terminal
-            ProcessBuilder pb = new ProcessBuilder("bash", "-c", "tput cols");
-            Process proceso = pb.start();
-            
-            BufferedReader reader = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
-            String line = reader.readLine();
-            if (line != null) {
-                //convertimos la salida del comando tput cols, que es una cadena de texto representando un número, en un valor entero
-                //line.trim(): Esto elimina cualquier espacio en blanco al principio o al final de la cadena line.
-                columns = Integer.parseInt(line.trim());
-            }
-            // Esperar a que el proceso termine
-            proceso.waitFor();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return columns;
-    }
+package comptadorcolumnes;
 
-    public static void main(String[] args) {
-        int columns = getTerminalColumns();
-        System.out.println("Número de columnas en el terminal: " + columns);
-    }
+import java.io.BufferedReader;
+import java.io.IOException;
+
+/**
+ * Columns
+ */
+ 
+ 
+ //per executar: comentar una api o l'altre
+ public class Comptador {
+ 
+ 	public static void main(String[] args) throws IOException{
+ 		int c = 0;
+ 		try{
+ //API VELLA
+  			//1ra alternativa
+ 			Process p=null;
+ 			try{
+ 			    // Ejecutar el comando 'tput cols' en el terminal
+ 			    //fem la redirecció  del standard error (stderr) perquè el tput cols mira tots els standars per veure per sobre quin terminal li demanen tput cols, 
+ 			    //llavors hem d'usar un que no es fa servir(per exemple, fem fervir el out, hem de redirigir cap a un que no usem, en aquest cas, el err)
+            		    p = new ProcessBuilder("tput", "cols").redirectError(ProcessBuilder.Redirect.INHERIT).start();
+			    Process proceso = p.start();
+			    c = Integer.parseInt(new BufferedReader(new InputStreamReader(proceso.getInputStream())).readLine());
+			    p.waitFor();
+			} catch (IOException | InterruptedException e) {
+			    e.printStackTrace();
+			}
+			
+//API NOVA
+ 			
+ 			//2na alternativa
+ 		//	Process p=null;
+ 		//	try{
+ 			    // Ejecutar el comando 'tput cols' en el terminal
+ 			    //
+            	//	    p = Runtime.getRuntime().exec(new String[] {"/bin/sh", "-c", "tput", "cols", "2>/dev/tty"});
+            	//	    p.waitFor();
+		//	    c = Integer.parseInt(new BufferedReader(new InputStreamReader(proceso.getInputStream())).readLine());
+
+		//	} catch (IOException | InterruptedException e) {
+		//	    e.printStackTrace();
+		//	}
+ 			
+ 			
+ 			//3ra alternativa (amb seqüència de scape)
+ 		//	Kbd.setRaw();
+ 		//	System.out.print("\033[18t"); //per injectar
+ 			//returns CSI 8; height ; width t ; ---> el que he parsejat
+ 			//retorna el que s'ha injectat al standard input.
+ 			//per parsejar hem de usar expressions regulars
+ 			//no tenim el string per parsejar, ho fem a traves d'un stream, llavors usem el constructor de scanner que li passa un stream en comptes d'un string
+ 		//	Scanner sc = new Scanner(System.in);
+ 		//	sc.skip("\033\\[8;\\d+;()\\d+)t");
+ 		//	c = Integer.parseInt(sc.match().group(1));
+ 			
+ 			
+ 			//4ta alternativa (amb seqüència de scape)
+ 		//	Kbd.setRaw();
+ 		//	System.out.print("\033[18t"); //per injectar
+ 		//	Scanner sc = new Scanner(System.in);
+ 			// Saltem la part inicial de la seqüència de scape "\033[8;"
+ 			// Establim el delimitador a ";" per llegir el primer número
+ 		//	sc.skip("\033\\[8;").useDelimiter(";");
+ 			// Llegim el primer número (height)
+ 		//	sc.nextInt();
+ 			// Saltem el delimitador ";" i establim el delimitador a "t" per llegir el segon número
+ 		//	sc.skip(";").useDelimiter("t");
+ 			// Llegim el segon número (width) i ho guardem
+ 		//	c = sc.nextInt();
+ 			// Saltem el delimitador "t"
+ 		//	sc.skip("t");
+ 			
+ 			
+ 			//5ta alternativa (amb seqüència de scape)
+ 			//System.getnevn() ---> per llegir variables de entorn
+ 		//	c = Integer.parseInt(System.getenv("COLUMNS"));
+ 			//PROBLEMA: no ho fa a la consula a menys de que la passem explicitament, és a dir, escriure a la consola: COLUMNS = COLUMNS
+ 			//SOLUCIÓ: export COLUMNS
+ 			
+ 		}finally{
+ 			//TODO: handle exception
+ 			//(3ra i 4ta alternativa)
+ 		//	Kbd.unsetRaw();
+ 		}
+ 		System.out.println("COLUMNS = "+ c);
+ 		
+ 		
+ 	}
 }
+
