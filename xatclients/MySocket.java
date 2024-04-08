@@ -20,13 +20,14 @@ public class MySocket {
     protected Socket s; // Socket per a la comunicació
     protected BufferedReader entradaTxt; // Per llegir missatges rebuts
     protected PrintWriter sortidaTxt; // Per enviar missatges
-   
+    protected String nick; // Nom de l'usuari del socket
+        
     /**
      * Constructor que crea una nova connexió amb el servidor especificat.
      * @param ipServidor Adreça IP del servidor
      * @param portServidor Port del servidor
      */
-    public MySocket(String ipServidor, int portServidor){
+    public MySocket(String ipServidor, int portServidor, String Nick){
         try {
             // Intenta establir una connexió amb el servidor utilitzant la IP i el port especificats
             s = new Socket(ipServidor, portServidor);
@@ -34,7 +35,9 @@ public class MySocket {
             entradaTxt = new BufferedReader(new InputStreamReader(s.getInputStream()));        
             // Inicialitza el gestor de sortida per enviar missatges
             sortidaTxt = new PrintWriter(s.getOutputStream(),true);
-           
+            
+            this.nick=nick;
+            
         } catch (IOException ex) {
             Logger.getLogger(MySocket.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,7 +47,7 @@ public class MySocket {
      * Constructor que utilitza una connexió existent.
      * @param sc Socket ja existent
      */
-    public MySocket(Socket sc){
+    public MySocket(Socket sc, String Nick){
         try {
             // Utilitza el socket ja existent per comunicar-se
             s = sc;
@@ -53,6 +56,8 @@ public class MySocket {
             // Inicialitza el gestor de sortida per enviar missatges
             sortidaTxt = new PrintWriter(s.getOutputStream(),true);
            
+            this.nick= nick;
+            
         } catch (IOException ex) {
             Logger.getLogger(MySocket.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -80,6 +85,10 @@ public class MySocket {
             Logger.getLogger(MySocket.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+    
+    public String getNick(){
+        return nick;
     }
 
 }
