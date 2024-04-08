@@ -6,22 +6,29 @@ package xatclients;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import practica1.CircularQ.CircularQueue;
 
 /**
  *
  * @author sara
  */
+
+
+
+//FER METODE GETNICK A LA CLASSE SOCKET
+
 public class MyServerSocket {
 
     public static void main(String[] args) {
 
-        Servidor2 serv = new Servidor2(Comms.PORT_SERVIDOR);
-        System.out.println("Servidor Eco Escoltant ... Port : " + Comms.PORT_SERVIDOR + "\n");
+        Servidor2 serv = new Servidor2(Integer.parseInt(args[0]));
+        System.out.println("Servidor amb Port : " + Integer.parseInt(args[0]) + "\n");
         new Thread(serv).start();
 
     }
@@ -32,11 +39,9 @@ class Servidor2 implements Runnable {
 
     protected ServerSocket ss;
 
-    // broadcast
-    protected ArrayList<MySocket> llistaSocketsConnect ;
-//buffer llista sockets connectats
+    //llista sockets connectats
+    protected Map<String, MySocket> llistaSocketsConnect ;
 
-//**buffer strings:
     protected Buffer strings;
     
     public Servidor2(int port) {
@@ -44,11 +49,9 @@ class Servidor2 implements Runnable {
 
             ss = new ServerSocket(port);
             
-            //** inicialitzar buffer strings
+            // inicialitzar buffer strings
             strings = new Buffer(100);
-         //  inicialitzar buffer
-            llistaSocketsConnect = new ArrayList();
-        // crear thread broadcast
+            llistaSocketsConnect = new HashMap<>();
             Broadcast broad = new Broadcast(strings, llistaSocketsConnect);
             new Thread(broad).start();
 
@@ -61,10 +64,10 @@ class Servidor2 implements Runnable {
         while (true) {
             try {
                 
-                MySocket s = new MySocket(ss.accept());
+                MySocket s = new MySocket(ss.accept(), "nick_default");
                 // POSAR SOCKET llista sockets connectats
-                // iniciar thread ajudant
-                llistaSocketsConnect.add(s);
+                String nick = s.getNick(); // Obtener el nick del cliente
+                llistaSocketsConnect.put(nick, s);
                 Ajudant ajudant = new Ajudant(strings, s);
                 new Thread(ajudant).start();
                 
@@ -76,6 +79,10 @@ class Servidor2 implements Runnable {
 }
 
 class Ajudant implements Runnable {
+//  while(true){
+//    llegir del socket posar al buffer
+//  }
+
     
     MySocket s;
     protected Buffer strings;
@@ -90,46 +97,34 @@ class Ajudant implements Runnable {
             strings.put(m);
         }
     }
-    
-    // run
-   
-//        while(true){
-//        llegir del socket posar al buffer
-//    }
+
 
 }
 
 class Broadcast implements Runnable {
     
     protected Buffer strings;
-    protected  ArrayList<MySocket> sockets;
+    protected Map<String, MySocket> sockets;
     
-    public Broadcast(Buffer strings, ArrayList<MySocket> sockets){
+    public Broadcast(Buffer strings, Map<String, MySocket> sockets){
         this.strings=strings;
         this.sockets= sockets;
     }
     
     public void run() {
-        while(true){
-            String m = strings.get().toString();
-            for(int i = 0;i<sockets.size();i++){
-                sockets.get(i).enviar(m);
-            }
-//            Iterator<AstSocket> iterador2 = sockets.q.iterator();
-//            
-//                while (iterador2.hasNext()) {
-//                    AstSocket so = iterador2.next();
-//                    so.enviar(m);
-//                }    
-//                
-//            }
-        }
-    }
-//    // run
-//   
-//        while(true){
+//    while(true){
 //        agafar string buffer recorrer llista sockets connectats i enviar a cada socket
 //    }
+        while(true){
+            String m = strings.get().toString();
+            for (MySocket socket : sockets.values()) {
+                    socket.enviar(m);
+            }
+
+        }
+    }
+
+
 
 }
 
@@ -148,12 +143,15 @@ class Buffer {
 
     public void put(String e) {
         mon.lock();
-        while (q.full()) {
-            noPlena.awaitUninterruptibly();
+        try {
+            while (q.full()) {
+                noPlena.awaitUninterruptibly();
+            }
+            q.put(e);
+            noBuida.signal();
+        } finally {
+            mon.unlock();
         }
-        q.put(e);
-        noBuida.signal();
-        mon.unlock();
     }
 
     public Object get() {
@@ -168,40 +166,3 @@ class Buffer {
     }
 
 }
-
-
-/*
-
-class Servidor2 implements Runnable {
-
-    protected ServerSocket ss;
-
-    public Servidor2(int port) {
-        try {
-
-            ss = new ServerSocket(port);
-
-        } catch (IOException ex) {
-            Logger.getLogger(Servidor2.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public void run() {
-
-        while (true) {
-            try {
-                MonitorSync mon = new MonitorSync();
-                AstSocket s = new AstSocket(ss.accept());
-                FilTeclat ft = new FilTeclat(s, mon);
-                FilSocket fs = new FilSocket(s, mon);
-                new Thread(ft).start();
-                new Thread(fs).start();
-
-            } catch (IOException ex) {
-                Logger.getLogger(Servidor2.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-}
-
-*/
