@@ -11,39 +11,25 @@ import java.util.Random;
 import java.util.Scanner;
 /**
  *
- * @author celia
+ * @author celia & sara
  */
 public class HangmanSAD {
-    
-    final static int MAX_PAL = 20;
-    final static int FALSE = 0;
-    final static int TRUE = 1;
-    final static int MAX_CADENA = 100;
-    
-    /*static class Tahorcado {
-        char[] pjug = new char[MAX_PAL];
-        char[] pfinal = new char[MAX_PAL];
-        int nletras;
-        int vidas;
-    }
-    
-    static class LlistaParaules{
-        int npal;
-        Tahorcado[] vpal = new Tahorcado[MAX_CADENA];
-    }*/
 
-    public static int demanarNum(){
-        Scanner scanner;
+    static char[] pjug;
+    static char[] pfinal;
+    static int vides = 6; // num de vides a cada partida
+    static int intents = 0; // num d'intents que porta el jugador
+    static Scanner inputScanner = new Scanner(System.in); // Scanner global
+
+    public static int demanarNum() {
         System.out.print("Cantidad de caracteres de la palabra a acertar (maximo 20 caracteres): ");
-        Scanner inputScanner = new Scanner(System.in);
         int nc = inputScanner.nextInt();
-        inputScanner.close();
-        return nc; //aquest nc serà la longitud de la paraula a endevinar
+        return nc; // aquest nc serà la longitud de la paraula a endevinar
     }
 
     public static String paraula(String archivo, int longitudDeseada) {
         List<String> llista = new ArrayList<>();
- 
+
         try (Scanner scanner = new Scanner(new File(archivo))) {
             while (scanner.hasNextLine()) {
                 String pal = scanner.nextLine();
@@ -63,9 +49,54 @@ public class HangmanSAD {
             return null;
         }
     }
-  
-    public static void main(String[] args){
-        int num=demanarNum();
-        String Solucio= paraula("pals",num);
+
+    public static boolean comparador(char lletra) {
+        boolean encert = false;
+        for (int i = 0; i < pfinal.length; i++) {
+            if (pfinal[i] == lletra) {
+                pjug[i] = lletra;
+                encert = true;
+            }
+        }
+        if(!encert) intents++;
+        return encert;
+    }
+
+    public static boolean guanyar() {
+        boolean guanyat = true;
+        for (int i = 0; i < pfinal.length; i++) {
+            if (pjug[i] != pfinal[i])
+                guanyat = false;
+        }
+        return guanyat;
+    }
+
+    public static char demanaLletra() {
+        System.out.print("Digues una lletra: ");
+        String slletra = inputScanner.next();
+        char lletra = slletra.charAt(0);
+        return lletra;
+    }
+
+    public static void main(String[] args) {
+        int num = demanarNum();
+        char aux;
+        String Solucio = paraula("pals", num);
+        pfinal = Solucio.toCharArray();
+        pjug = new char[pfinal.length];
+        System.out.println(Solucio); // imprimeix la paraula que s'ha d'endevinar
+        do {
+            aux = demanaLletra();
+            if (!comparador(aux)) {
+                System.out.println("Lletra incorrecta! Perds una vida.");
+            } else {
+                System.out.println(pjug);
+            }
+
+        } while (!guanyar() && intents < vides);
+        if (intents >= vides)
+            System.out.println("Has perdut");
+        else
+            System.out.println("Has guanyat");
     }
 }
