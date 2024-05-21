@@ -55,11 +55,13 @@ public class HangmanGUI {
         finestra = new JFrame("Joc del Penjat");
         finestra.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         finestra.setLayout(new GridBagLayout());
+        finestra.getContentPane().setBackground(Color.WHITE); // Fons blanc per a la finestra principal
     }
 
     // Configura el panell dels cors
     private void configurarPanellVides() {
         panellVides = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panellVides.setBackground(Color.WHITE); // Fons blanc per al panell de vides
         cors = new JLabel[vides];
 
         for (int i = 0; i < vides; i++) {
@@ -82,6 +84,7 @@ public class HangmanGUI {
         panellParaula = new JPanel();
         etiquetaParaula = new JLabel();
         panellParaula.add(etiquetaParaula);
+        panellParaula.setBackground(Color.WHITE); // Fons blanc per al panell de la paraula
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -97,6 +100,7 @@ public class HangmanGUI {
         panellAbecedari = new JPanel();
         GridLayout layout = new GridLayout(2, 13, 3, 3);
         panellAbecedari.setLayout(layout);
+        panellAbecedari.setBackground(Color.WHITE); // Fons blanc per al panell de l'abecedari
 
         botonsAbecedari = new JButton[26];
         char lletra = 'A';
@@ -124,6 +128,7 @@ public class HangmanGUI {
         penjatLabel = new JLabel();
         updatePenjatImage();
         panellPenjat.add(penjatLabel);
+        panellPenjat.setBackground(Color.WHITE); // Fons blanc per al panell del penjat
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -145,6 +150,7 @@ public class HangmanGUI {
     // Configura el panell per al botó de reiniciar
     private void configurarPanellRestart() {
         panellRestart = new JPanel();
+        panellRestart.setBackground(Color.WHITE); // Fons blanc per al panell de reiniciar
         JButton botoRestart = new JButton("Reiniciar Joc");
         botoRestart.setBackground(Color.PINK);
         botoRestart.setForeground(Color.DARK_GRAY);
@@ -272,12 +278,16 @@ public class HangmanGUI {
         finestraBenvinguda.setSize(500, 200);
         finestraBenvinguda.setLocationRelativeTo(null); // Aquesta línia fa que la finestra es mostri al centre de la pantalla
         finestraBenvinguda.setLayout(new BorderLayout());
+        finestraBenvinguda.getContentPane().setBackground(Color.WHITE); // Fons blanc per a la finestra de benvinguda
 
         JLabel missatge = new JLabel("Benvingut al Joc del Penjat!", SwingConstants.CENTER);
         missatge.setFont(new Font("SansSerif", Font.BOLD, 25));
         missatge.setForeground(Color.DARK_GRAY);
+        missatge.setOpaque(true);
+        missatge.setBackground(Color.WHITE); // Fons blanc per al missatge
 
         JPanel panellInferior = new JPanel(new FlowLayout());
+        panellInferior.setBackground(Color.WHITE); // Fons blanc per al panell inferior
         JLabel instruccio = new JLabel("Introdueix la longitud de la paraula:");
         JTextField campLongitud = new JTextField(10);
 
